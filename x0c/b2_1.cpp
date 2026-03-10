@@ -3,7 +3,6 @@ using namespace std;
 
 int N, M;
 int arr[10];
-bool vis[10];
 
 void func(int k) {
     if (k == M) {
@@ -15,12 +14,8 @@ void func(int k) {
     }
 
     for (int i = 1; i <= N; i++) {
-        if (!vis[i]) {
-            arr[k] = i;
-            vis[i] = 1;
-            func(k+1);
-            vis[i] = 0;
-        }
+        arr[k] = i;
+        func(k + 1);
     }
 }
 
