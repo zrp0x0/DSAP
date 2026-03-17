@@ -1,59 +1,101 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-string input;
-string bomb;
+int N;
+string line;
 
-deque<char> DQ;
-stack<char> S;
+string num;
 
-int main(void) {
-    ios_base::sync_with_stdio(false);
-    cin.tie(nullptr);
+bool func() {
 
-    cin >> input;
-    cin >> bomb;
+    queue<char> Q;
+    deque<string> D;
 
-    int be = bomb.length() - 1;
-    char bb = bomb[be];
-
-    // 핵심 로직
-    for (int i = 0; i < input.length(); i++) {
-        DQ.push_back(input[i]);
-
-        int be = bomb.length() - 1;
-        if (DQ.back() == bb) {
-            while (!DQ.empty() && DQ.back() == bomb[be]) {
-                S.push(DQ.back());
-                DQ.pop_back();
-                be--;
-                if (be < 0)
-                    break;
+    for (int i = 0; i < 3; i++) {
+        getline(cin, line);
+        if (i == 0) {
+            int n = line.length();
+            int idx = 0;
+            while (n--) {
+                Q.push(line[idx++]);
             }
-            
-            if (be < 0) {
-                // 잘꺼내왔다
-                while (!S.empty()) {
-                    S.pop();
+        }
+
+        if (i == 2) {
+            for (char c : line) {
+                if (c == ']') {
+                    if (num != "") {
+                        D.push_back(num);
+                    }
+                    num = ""; 
+                    break;
                 }
-            } else {
-                // 못꺼내왔다
-                while (!S.empty()) {
-                    DQ.push_back(S.top());
-                    S.pop();
+                   
+                
+                if (isdigit(c)) {
+                    num += c;
+                } else if (c == ',') {
+                    D.push_back(num);
+                    num = "";
                 }
             }
         }
     }
 
-    if (!DQ.empty()) {
-        while (!DQ.empty()) {
-            cout << DQ.front();
-            DQ.pop_front();
+    bool DP = true; // front vs back
+    while (!Q.empty()) {
+        char c = Q.front(); Q.pop();
+
+        if (c == 'R') {
+            DP = !DP;
+        } else {
+            if (D.empty())
+                return false;
+
+            if (DP) {
+                D.pop_front();
+            } else {
+                D.pop_back();
+            }
         }
-    cout << '\n';
-    } else {
-        cout << "FRULA" << '\n';
+    }
+
+    // 최종 출력
+    cout << '[';
+    while (!D.empty()) {
+        if (DP) {
+            if (D.size() == 1) {
+                cout << D.front();
+                D.pop_front();
+            } else {
+                cout << D.front() << ",";
+                D.pop_front();
+            }
+            
+        } else {
+            if (D.size() == 1) {
+                cout << D.back();
+                D.pop_back();
+            } else {
+                cout << D.back() << ",";
+                D.pop_back();
+            }
+        }
+    }
+    cout << "]\n";
+
+    return true;
+}
+
+int main(void) {
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    cin >> N;
+    cin.ignore();
+    for (int i = 0; i < N; i++) {
+        if (!func())
+            cout << "error" << '\n';
     }
 
     return 0;
