@@ -1,102 +1,47 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-int N;
-string line;
+int N, M, ans = 999;
+char arr[51][51];
 
-string num;
+void counting(int stN, int stM, char target) {
+    int min = 0;
 
-bool func() {
-
-    queue<char> Q;
-    deque<string> D;
-
-    for (int i = 0; i < 3; i++) {
-        getline(cin, line);
-        if (i == 0) {
-            int n = line.length();
-            int idx = 0;
-            while (n--) {
-                Q.push(line[idx++]);
+    for (int i = stN; i < stN + 8; i++) {
+        for (int j = stM; j < stM + 8; j++) {
+            if (arr[i][j] != target) {
+                min++;
             }
+            target = (target == 'W' ? 'B' : 'W');
         }
-
-        if (i == 2) {
-            for (char c : line) {
-                if (c == ']') {
-                    if (num != "") {
-                        D.push_back(num);
-                    }
-                    num = ""; 
-                    break;
-                }
-                   
-                
-                if (isdigit(c)) {
-                    num += c;
-                } else if (c == ',') {
-                    D.push_back(num);
-                    num = "";
-                }
-            }
-        }
+        target = (target == 'W' ? 'B' : 'W');
     }
 
-    bool DP = true; // front vs back
-    while (!Q.empty()) {
-        char c = Q.front(); Q.pop();
-
-        if (c == 'R') {
-            DP = !DP;
-        } else {
-            if (D.empty())
-                return false;
-
-            if (DP) {
-                D.pop_front();
-            } else {
-                D.pop_back();
-            }
-        }
-    }
-
-    // 최종 출력
-    cout << '[';
-    while (!D.empty()) {
-        if (DP) {
-            if (D.size() == 1) {
-                cout << D.front();
-                D.pop_front();
-            } else {
-                cout << D.front() << ",";
-                D.pop_front();
-            }
-            
-        } else {
-            if (D.size() == 1) {
-                cout << D.back();
-                D.pop_back();
-            } else {
-                cout << D.back() << ",";
-                D.pop_back();
-            }
-        }
-    }
-    cout << "]\n";
-
-    return true;
+    if (ans > min) ans = min;
 }
 
 int main(void) {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
+    cin >> N >> M;
+    for (int i = 0; i < N; i++)
+        for (int j = 0; j < M; j++)
+            cin >> arr[i][j];
 
-    cin >> N;
-    cin.ignore();
-    for (int i = 0; i < N; i++) {
-        if (!func())
-            cout << "error" << '\n';
+    int stN = 0;
+    int stM = 0;
+
+    for (int i = 0; i < N - 8 + 1; i++) {
+        for (int j = 0; j < M - 8 + 1; j++) {
+            // 시작을 W로 하는 경우
+            counting(stN + i, stM + j, 'W');
+
+            // 시작을 B로 하는 경우
+            counting(stN + i, stM + j, 'B');
+        }
     }
+
+    cout << ans << '\n';
 
     return 0;
 }
